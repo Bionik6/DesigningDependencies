@@ -1,31 +1,46 @@
-//
-//  ContentView.swift
-//  DesigningDependencies
-//
-//  Created by Ibrahima Ciss on 20/08/2021.
-//
-
 import SwiftUI
+import Combine
 
 class AppViewModel: ObservableObject {
   @Published var isConnected = true
-
+  @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
+  var weatherRequestCAncellable: AnyCancellable?
+  
   init(isConnected: Bool = true) {
     self.isConnected = isConnected
+    
+    weatherRequestCAncellable =  URLSession.shared.dataTaskPublisher(for:
+                                                                      URL(string: "https://www.metaweather.com/api/location/2459115")!
+    )
+    .map { data, _ in data }
+    .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
+    .receive(on: DispatchQueue.main)
+    .sink { _ in }
+      receiveValue: { [weak self] response in
+        self?.weatherResults = response.consolidatedWeather
+      }
   }
 }
 
 struct ContentView: View {
   @ObservedObject var viewModel: AppViewModel
-
+  
   var body: some View {
     NavigationView {
       ZStack(alignment: .bottom) {
         ZStack(alignment: .bottomTrailing) {
           List {
-            EmptyView()
+            ForEach(self.viewModel.weatherResults, id: \.id) { weather in
+              VStack(alignment: .leading) {
+                Text(dayOfWeekFormatter.string(from: weather.applicableDate).capitalized)
+                  .font(.title)
+                Text("Current temp: \(weather.theTemp, specifier: "%.1f")°C")
+                Text("Max temp: \(weather.maxTemp, specifier: "%.1f")°C")
+                Text("Min temp: \(weather.minTemp, specifier: "%.1f")°C")
+              }
+            }
           }
-
+          
           Button(
             action: {  }
           ) {
@@ -37,11 +52,11 @@ struct ContentView: View {
           .clipShape(Circle())
           .padding()
         }
-
+        
         if !self.viewModel.isConnected {
           HStack {
             Image(systemName: "exclamationmark.octagon.fill")
-
+            
             Text("Not connected to internet")
           }
           .foregroundColor(.white)
@@ -55,7 +70,35 @@ struct ContentView: View {
 }
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(viewModel: AppViewModel())
-    }
+  static var previews: some View {
+    ContentView(viewModel: AppViewModel())
+  }
 }
+
+let dayOfWeekFormatter: DateFormatter = {
+  let formatter = DateFormatter()
+  formatter.dateFormat = "EEEE"
+  return formatter
+}()
+
+
+struct WeatherResponse: Decodable, Equatable {
+  var consolidatedWeather: [ConsolidatedWeather]
+  
+  struct ConsolidatedWeather: Decodable, Equatable {
+    var applicableDate: Date
+    var id: Int
+    var maxTemp: Double
+    var minTemp: Double
+    var theTemp: Double
+  }
+}
+
+private let weatherJsonDecoder: JSONDecoder = {
+  let jsonDecoder = JSONDecoder()
+  let formatter = DateFormatter()
+  formatter.dateFormat = "yyyy-MM-dd"
+  jsonDecoder.dateDecodingStrategy = .formatted(formatter)
+  jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+  return jsonDecoder
+}()
