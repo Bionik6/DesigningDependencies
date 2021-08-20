@@ -1,20 +1,31 @@
 import SwiftUI
 import Combine
 
+protocol WeatherClientProtocol {
+  func weather() -> AnyPublisher<WeatherResponse, Error>
+}
+
+struct WeatherClient: WeatherClientProtocol {
+  func weather() -> AnyPublisher<WeatherResponse, Error> {
+    URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/2459115")!)
+    .map { data, _ in data }
+    .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
+    .receive(on: DispatchQueue.main)
+    .eraseToAnyPublisher()
+  }
+}
+
 class AppViewModel: ObservableObject {
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   var weatherRequestCAncellable: AnyCancellable?
+  var weatherClient: WeatherClientProtocol
   
-  init(isConnected: Bool = true) {
+  init(isConnected: Bool = true, weatherClient: WeatherClientProtocol = WeatherClient()) {
     self.isConnected = isConnected
+    self.weatherClient = weatherClient
     
-    weatherRequestCAncellable =  URLSession.shared.dataTaskPublisher(for:
-                                                                      URL(string: "https://www.metaweather.com/api/location/2459115")!
-    )
-    .map { data, _ in data }
-    .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
-    .receive(on: DispatchQueue.main)
+    weatherRequestCAncellable = weatherClient.weather()
     .sink { _ in }
       receiveValue: { [weak self] response in
         self?.weatherResults = response.consolidatedWeather
