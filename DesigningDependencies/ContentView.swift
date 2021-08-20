@@ -15,23 +15,42 @@ struct WeatherClient: WeatherClientProtocol {
   }
 }
 
-struct MockWeatherClient: WeatherClientProtocol {
+struct EmptyWeatherClient: WeatherClientProtocol {
   func weather() -> AnyPublisher<WeatherResponse, Error> {
-    Just(WeatherResponse(consolidatedWeather: [
-      .init(applicableDate: Date(), id: 1, maxTemp: 32, minTemp: 28, theTemp: 30),
-      .init(applicableDate: Date().addingTimeInterval(86400), id: 2, maxTemp: -10, minTemp: -20, theTemp: -20)
-    ]))
+    Just(WeatherResponse(consolidatedWeather: []))
       .setFailureType(to: Error.self)
-      .delay(for: 3, scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
+  }
+}
+
+struct HappyPathWeatherClient: WeatherClientProtocol {
+  func weather() -> AnyPublisher<WeatherResponse, Error> {
+    Just(
+      WeatherResponse(
+        consolidatedWeather: [
+          .init(applicableDate: Date(), id: 1, maxTemp: 30, minTemp: 10, theTemp: 20),
+          .init(applicableDate: Date().addingTimeInterval(86400), id: 2, maxTemp: -10, minTemp: -30, theTemp: -20)
+        ]
+      )
+    )
+    .setFailureType(to: Error.self)
+    .eraseToAnyPublisher()
+  }
+}
+
+struct FailedWeatherClient: WeatherClientProtocol {
+  func weather() -> AnyPublisher<WeatherResponse, Error> {
+    Fail(error: NSError(domain: "", code: 1))
       .eraseToAnyPublisher()
   }
 }
 
 class AppViewModel: ObservableObject {
+  var weatherClient: WeatherClientProtocol
+  var weatherRequestCancellable: AnyCancellable?
+  
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
-  var weatherRequestCancellable: AnyCancellable?
-  var weatherClient: WeatherClientProtocol
   
   init(isConnected: Bool = true, weatherClient: WeatherClientProtocol = WeatherClient()) {
     self.isConnected = isConnected
@@ -93,7 +112,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView(viewModel: AppViewModel(weatherClient: MockWeatherClient()))
+    ContentView(viewModel: AppViewModel(weatherClient: EmptyWeatherClient()))
   }
 }
 
