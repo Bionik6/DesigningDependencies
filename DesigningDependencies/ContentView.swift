@@ -22,6 +22,7 @@ struct MockWeatherClient: WeatherClientProtocol {
       .init(applicableDate: Date().addingTimeInterval(86400), id: 2, maxTemp: -10, minTemp: -20, theTemp: -20)
     ]))
       .setFailureType(to: Error.self)
+      .delay(for: 3, scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
   }
 }
