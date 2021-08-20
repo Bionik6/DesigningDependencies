@@ -8,10 +8,18 @@ protocol WeatherClientProtocol {
 struct WeatherClient: WeatherClientProtocol {
   func weather() -> AnyPublisher<WeatherResponse, Error> {
     URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/2459115")!)
-    .map { data, _ in data }
-    .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
-    .receive(on: DispatchQueue.main)
-    .eraseToAnyPublisher()
+      .map { data, _ in data }
+      .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
+      .receive(on: DispatchQueue.main)
+      .eraseToAnyPublisher()
+  }
+}
+
+struct MockWeatherClient: WeatherClientProtocol {
+  func weather() -> AnyPublisher<WeatherResponse, Error> {
+    Just(WeatherResponse(consolidatedWeather: []))
+      .setFailureType(to: Error.self)
+      .eraseToAnyPublisher()
   }
 }
 
@@ -25,11 +33,12 @@ class AppViewModel: ObservableObject {
     self.isConnected = isConnected
     self.weatherClient = weatherClient
     
-    weatherRequestCAncellable = weatherClient.weather()
-    .sink { _ in }
-      receiveValue: { [weak self] response in
-        self?.weatherResults = response.consolidatedWeather
-      }
+    weatherRequestCAncellable = weatherClient
+      .weather()
+      .sink { _ in }
+        receiveValue: { [weak self] response in
+          self?.weatherResults = response.consolidatedWeather
+        }
   }
 }
 
@@ -82,7 +91,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView(viewModel: AppViewModel())
+    ContentView(viewModel: AppViewModel(weatherClient: MockWeatherClient()))
   }
 }
 
