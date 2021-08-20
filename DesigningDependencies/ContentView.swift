@@ -17,7 +17,10 @@ struct WeatherClient: WeatherClientProtocol {
 
 struct MockWeatherClient: WeatherClientProtocol {
   func weather() -> AnyPublisher<WeatherResponse, Error> {
-    Just(WeatherResponse(consolidatedWeather: []))
+    Just(WeatherResponse(consolidatedWeather: [
+      .init(applicableDate: Date(), id: 1, maxTemp: 32, minTemp: 28, theTemp: 30),
+      .init(applicableDate: Date().addingTimeInterval(86400), id: 2, maxTemp: -10, minTemp: -20, theTemp: -20)
+    ]))
       .setFailureType(to: Error.self)
       .eraseToAnyPublisher()
   }
@@ -26,19 +29,17 @@ struct MockWeatherClient: WeatherClientProtocol {
 class AppViewModel: ObservableObject {
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
-  var weatherRequestCAncellable: AnyCancellable?
+  var weatherRequestCancellable: AnyCancellable?
   var weatherClient: WeatherClientProtocol
   
   init(isConnected: Bool = true, weatherClient: WeatherClientProtocol = WeatherClient()) {
     self.isConnected = isConnected
     self.weatherClient = weatherClient
     
-    weatherRequestCAncellable = weatherClient
+    weatherRequestCancellable = weatherClient
       .weather()
       .sink { _ in }
-        receiveValue: { [weak self] response in
-          self?.weatherResults = response.consolidatedWeather
-        }
+        receiveValue: { [weak self] in self?.weatherResults = $0.consolidatedWeather }
   }
 }
 
