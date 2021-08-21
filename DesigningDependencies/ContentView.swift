@@ -1,8 +1,12 @@
 import SwiftUI
 import Combine
+import CoreLocation
+
+struct Location { }
 
 protocol WeatherClientProtocol {
   func weather() -> AnyPublisher<WeatherResponse, Error>
+  func searchLocations(coordinate: CLLocationCoordinate2D) -> AnyPublisher<[Location], Error>
 }
 
 struct WeatherClient: WeatherClientProtocol {
