@@ -9,26 +9,38 @@ protocol WeatherClientProtocol {
   func searchLocations(coordinate: CLLocationCoordinate2D) -> AnyPublisher<[Location], Error>
 }
 
-struct WeatherClient: WeatherClientProtocol {
-  func weather() -> AnyPublisher<WeatherResponse, Error> {
+
+struct WeatherClient {
+  var weather: () -> AnyPublisher<WeatherResponse, Error>
+  var searchLocations: (CLLocationCoordinate2D) -> AnyPublisher<[Location], Error>
+}
+
+
+extension WeatherClient {
+  static let live = Self(weather: {
     URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/2459115")!)
       .map { data, _ in data }
       .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
       .receive(on: DispatchQueue.main)
       .eraseToAnyPublisher()
-  }
+  }, searchLocations:  { coordinates in
+    fatalError()
+  })
 }
 
-struct EmptyWeatherClient: WeatherClientProtocol {
-  func weather() -> AnyPublisher<WeatherResponse, Error> {
+
+extension WeatherClient {
+  static let empty = Self(weather: {
     Just(WeatherResponse(consolidatedWeather: []))
       .setFailureType(to: Error.self)
       .eraseToAnyPublisher()
-  }
-}
-
-struct HappyPathWeatherClient: WeatherClientProtocol {
-  func weather() -> AnyPublisher<WeatherResponse, Error> {
+  }, searchLocations:  { coordinates in
+    Just([])
+      .setFailureType(to: Error.self)
+      .eraseToAnyPublisher()
+  })
+  
+  static let happyPath = Self(weather: {
     Just(
       WeatherResponse(
         consolidatedWeather: [
@@ -39,24 +51,30 @@ struct HappyPathWeatherClient: WeatherClientProtocol {
     )
     .setFailureType(to: Error.self)
     .eraseToAnyPublisher()
-  }
-}
-
-struct FailedWeatherClient: WeatherClientProtocol {
-  func weather() -> AnyPublisher<WeatherResponse, Error> {
+  }, searchLocations: { _ in
+    Just([])
+      .setFailureType(to: Error.self)
+      .eraseToAnyPublisher()
+  })
+  
+  static let failed = Self(weather: {
     Fail(error: NSError(domain: "", code: 1))
       .eraseToAnyPublisher()
-  }
+  }, searchLocations: { _ in
+    Just([])
+      .setFailureType(to: Error.self)
+      .eraseToAnyPublisher()
+  })
 }
 
 class AppViewModel: ObservableObject {
-  var weatherClient: WeatherClientProtocol
+  var weatherClient: WeatherClient
   var weatherRequestCancellable: AnyCancellable?
   
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
-  init(isConnected: Bool = true, weatherClient: WeatherClientProtocol = WeatherClient()) {
+  init(isConnected: Bool = true, weatherClient: WeatherClient = .live) {
     self.isConnected = isConnected
     self.weatherClient = weatherClient
     
@@ -101,7 +119,6 @@ struct ContentView: View {
         if !self.viewModel.isConnected {
           HStack {
             Image(systemName: "exclamationmark.octagon.fill")
-            
             Text("Not connected to internet")
           }
           .foregroundColor(.white)
@@ -116,7 +133,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView(viewModel: AppViewModel(weatherClient: EmptyWeatherClient()))
+    ContentView(viewModel: AppViewModel(weatherClient: .happyPath))
   }
 }
 
