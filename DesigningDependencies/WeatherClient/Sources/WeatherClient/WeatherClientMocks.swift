@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 extension WeatherClient {
-  static let empty = Self(weather: {
+  public static let empty = Self(weather: {
     Just(WeatherResponse(consolidatedWeather: []))
       .setFailureType(to: Error.self)
       .eraseToAnyPublisher()
@@ -12,7 +12,7 @@ extension WeatherClient {
       .eraseToAnyPublisher()
   })
   
-  static let happyPath = Self(weather: {
+  public static let happyPath = Self(weather: {
     Just(
       WeatherResponse(
         consolidatedWeather: [
@@ -29,7 +29,7 @@ extension WeatherClient {
       .eraseToAnyPublisher()
   })
   
-  static let failed = Self(weather: {
+  public static let failed = Self(weather: {
     Fail(error: NSError(domain: "", code: 1))
       .eraseToAnyPublisher()
   }, searchLocations: { _ in
