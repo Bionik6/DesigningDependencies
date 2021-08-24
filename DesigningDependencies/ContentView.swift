@@ -9,7 +9,6 @@ struct WeatherClient {
   var searchLocations: (CLLocationCoordinate2D) -> AnyPublisher<[Location], Error>
 }
 
-
 extension WeatherClient {
   static let live = Self(weather: {
     URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/2459115")!)
