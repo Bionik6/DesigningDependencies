@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,6 +12,7 @@
 		4020DA4626D034CC0083DD3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4526D034CC0083DD3F /* Assets.xcassets */; };
 		4020DA4926D034CC0083DD3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4826D034CC0083DD3F /* Preview Assets.xcassets */; };
 		4020DA5126D037470083DD3F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4020DA5026D037470083DD3F /* Data.swift */; };
+		40ED017226D5A74800847E78 /* WeatherClient in Frameworks */ = {isa = PBXBuildFile; productRef = 40ED017126D5A74800847E78 /* WeatherClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40ED017226D5A74800847E78 /* WeatherClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +43,7 @@
 			children = (
 				4020DA4026D034CB0083DD3F /* DesigningDependencies */,
 				4020DA3F26D034CB0083DD3F /* Products */,
+				40ED017026D5A74800847E78 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -74,6 +77,13 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		40ED017026D5A74800847E78 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -90,6 +100,9 @@
 			dependencies = (
 			);
 			name = DesigningDependencies;
+			packageProductDependencies = (
+				40ED017126D5A74800847E78 /* WeatherClient */,
+			);
 			productName = DesigningDependencies;
 			productReference = 4020DA3E26D034CB0083DD3F /* DesigningDependencies.app */;
 			productType = "com.apple.product-type.application";
@@ -334,6 +347,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		40ED017126D5A74800847E78 /* WeatherClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WeatherClient;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4020DA3626D034CB0083DD3F /* Project object */;
 }
