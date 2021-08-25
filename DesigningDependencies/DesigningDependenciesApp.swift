@@ -6,7 +6,7 @@ import WeatherClientLive
 struct DesigningDependenciesApp: App {
   var body: some Scene {
     WindowGroup {
-      ContentView(viewModel: AppViewModel(weatherClient: .live))
+      ContentView(viewModel: AppViewModel(weatherClient: .live, pathMonitorClient: .live))
     }
   }
 }
