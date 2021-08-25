@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import WeatherClientLive
 
 @main
 struct DesigningDependenciesApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: AppViewModel())
+          ContentView(viewModel: AppViewModel(weatherClient: .live))
         }
     }
 }

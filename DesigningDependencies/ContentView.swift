@@ -11,7 +11,7 @@ class AppViewModel: ObservableObject {
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
-  init(isConnected: Bool = true, weatherClient: WeatherClient = .live) {
+  init(isConnected: Bool = true, weatherClient: WeatherClient) {
     self.isConnected = isConnected
     self.weatherClient = weatherClient
     
