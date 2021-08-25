@@ -1,3 +1,4 @@
+import Network
 import SwiftUI
 import Combine
 import CoreLocation
@@ -11,10 +12,23 @@ public class AppViewModel: ObservableObject {
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
-  public init(isConnected: Bool = true, weatherClient: WeatherClient) {
-    self.isConnected = isConnected
+  public init(weatherClient: WeatherClient) {
     self.weatherClient = weatherClient
     
+    let pathMonitor = NWPathMonitor()
+    pathMonitor.pathUpdateHandler = { [weak self] path in
+      guard let self = self else { return }
+      self.isConnected = path.status == .satisfied
+      if self.isConnected == true {
+        self.refreshWeather()
+      } else {
+        self.weatherResults = []
+      }
+    }
+  }
+  
+  private func refreshWeather() {
+    weatherResults = []
     weatherRequestCancellable = weatherClient
       .weather()
       .sink { _ in }
