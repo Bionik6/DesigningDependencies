@@ -15,8 +15,6 @@ let package = Package(
   targets: [
     .target(name: "WeatherClient", dependencies: []),
     .target(name: "WeatherClientLive", dependencies: ["WeatherClient"]),
-    .testTarget(
-      name: "WeatherClientTests",
-      dependencies: ["WeatherClient"]),
+    .testTarget(name: "WeatherClientTests", dependencies: ["WeatherClient"]),
   ]
 )

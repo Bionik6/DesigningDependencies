@@ -4,14 +4,14 @@ import CoreLocation
 import WeatherClient
 
 
-class AppViewModel: ObservableObject {
+public class AppViewModel: ObservableObject {
   var weatherClient: WeatherClient
   var weatherRequestCancellable: AnyCancellable?
   
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
-  init(isConnected: Bool = true, weatherClient: WeatherClient) {
+  public init(isConnected: Bool = true, weatherClient: WeatherClient) {
     self.isConnected = isConnected
     self.weatherClient = weatherClient
     
@@ -22,10 +22,14 @@ class AppViewModel: ObservableObject {
   }
 }
 
-struct ContentView: View {
+public struct ContentView: View {
   @ObservedObject var viewModel: AppViewModel
   
-  var body: some View {
+  public init(viewModel: AppViewModel) {
+    self.viewModel = viewModel
+  }
+  
+  public var body: some View {
     NavigationView {
       ZStack(alignment: .bottom) {
         ZStack(alignment: .bottomTrailing) {
@@ -78,4 +82,4 @@ let dayOfWeekFormatter: DateFormatter = {
   let formatter = DateFormatter()
   formatter.dateFormat = "EEEE"
   return formatter
-  }()
+}()
