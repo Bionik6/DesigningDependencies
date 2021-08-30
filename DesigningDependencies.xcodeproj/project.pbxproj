@@ -11,7 +11,7 @@
 		4020DA4626D034CC0083DD3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4526D034CC0083DD3F /* Assets.xcassets */; };
 		4020DA4926D034CC0083DD3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4826D034CC0083DD3F /* Preview Assets.xcassets */; };
 		4020DA5126D037470083DD3F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4020DA5026D037470083DD3F /* Data.swift */; };
-		4058C75026DD57B7008B12D7 /* PathMonitorClient in Frameworks */ = {isa = PBXBuildFile; productRef = 4058C74F26DD57B7008B12D7 /* PathMonitorClient */; };
+		4058C75226DD5C02008B12D7 /* PathMonitorClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 4058C75126DD5C02008B12D7 /* PathMonitorClientLive */; };
 		40918F5726D62CA900C7FF9B /* WeatherClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 40918F5626D62CA900C7FF9B /* WeatherClientLive */; };
 		40D7AA5026D62A1100182290 /* WeatherFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 40D7AA4F26D62A1100182290 /* WeatherFeature */; };
 /* End PBXBuildFile section */
@@ -33,7 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4058C75026DD57B7008B12D7 /* PathMonitorClient in Frameworks */,
+				4058C75226DD5C02008B12D7 /* PathMonitorClientLive in Frameworks */,
 				40918F5726D62CA900C7FF9B /* WeatherClientLive in Frameworks */,
 				40D7AA5026D62A1100182290 /* WeatherFeature in Frameworks */,
 			);
@@ -108,7 +108,7 @@
 			packageProductDependencies = (
 				40D7AA4F26D62A1100182290 /* WeatherFeature */,
 				40918F5626D62CA900C7FF9B /* WeatherClientLive */,
-				4058C74F26DD57B7008B12D7 /* PathMonitorClient */,
+				4058C75126DD5C02008B12D7 /* PathMonitorClientLive */,
 			);
 			productName = DesigningDependencies;
 			productReference = 4020DA3E26D034CB0083DD3F /* DesigningDependencies.app */;
@@ -355,9 +355,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4058C74F26DD57B7008B12D7 /* PathMonitorClient */ = {
+		4058C75126DD5C02008B12D7 /* PathMonitorClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PathMonitorClient;
+			productName = PathMonitorClientLive;
 		};
 		40918F5626D62CA900C7FF9B /* WeatherClientLive */ = {
 			isa = XCSwiftPackageProductDependency;

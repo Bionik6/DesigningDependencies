@@ -8,12 +8,13 @@ let package = Package(
   platforms: [.iOS(.v13)],
   products: [
     .library(name: "PathMonitorClient", targets: ["PathMonitorClient"]),
+    .library(name: "PathMonitorClientLive", targets: ["PathMonitorClientLive"]),
   ],
   dependencies: [
-    
   ],
   targets: [
     .target(name: "PathMonitorClient", dependencies: []),
+    .target(name: "PathMonitorClientLive", dependencies: ["PathMonitorClient"]),
     .testTarget(name: "PathMonitorClientTests", dependencies: ["PathMonitorClient"]),
   ]
 )

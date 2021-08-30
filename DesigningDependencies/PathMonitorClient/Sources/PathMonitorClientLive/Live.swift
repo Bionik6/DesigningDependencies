@@ -1,8 +1,18 @@
-//
-//  File.swift
-//  
-//
-//  Created by Ibrahima Ciss on 30/08/2021.
-//
+import Network
+import PathMonitorClient
 
-import Foundation
+
+extension PathMonitorClient {
+  public static var live: Self {
+    let monitor = NWPathMonitor()
+    return Self(
+      cancel: { },
+      setPathUpdateHandler: { callback in
+        monitor.pathUpdateHandler = { path in
+          callback(NetworkPath(rawValue: path))
+        }
+      },
+      start: monitor.start(queue:)
+    )
+  }
+}
