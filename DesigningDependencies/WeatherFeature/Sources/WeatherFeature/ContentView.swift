@@ -1,28 +1,14 @@
-import Network
 import SwiftUI
 import Combine
 import CoreLocation
 import WeatherClient
-
-public struct PathMonitorClient {
-  public var setPathUpdateHandler: (@escaping (NWPath) -> Void) -> Void
-  public var start: (DispatchQueue) -> Void
-}
-
-extension PathMonitorClient {
-  
-  public static var live: Self {
-    let monitor = NWPathMonitor()
-    return Self(setPathUpdateHandler: { monitor.pathUpdateHandler = $0 }, start: monitor.start(queue:))
-  }
-  
-}
+import PathMonitorClient
 
 
 public class AppViewModel: ObservableObject {
-  var weatherClient: WeatherClient
-  var pathMonitorClient: PathMonitorClient
-  var weatherRequestCancellable: AnyCancellable?
+  private var weatherClient: WeatherClient
+  private var pathMonitorClient: PathMonitorClient
+  private var weatherRequestCancellable: AnyCancellable?
   
   @Published var isConnected = true
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
@@ -36,6 +22,7 @@ public class AppViewModel: ObservableObject {
     
     self.pathMonitorClient.setPathUpdateHandler = { [weak self] path in
       guard let self = self else { return }
+      // let result = path(NetworkPath(status: .satisfied))
       // self.isConnected = path.status == .satisfied
       if self.isConnected == true {
         self.refreshWeather()
@@ -45,7 +32,7 @@ public class AppViewModel: ObservableObject {
     }
     
     pathMonitorClient.start(.main)
-    self.refreshWeather()
+    // self.refreshWeather()
   }
   
   private func refreshWeather() {
@@ -110,7 +97,7 @@ public struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .live))
+    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied))
   }
 }
 

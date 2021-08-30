@@ -11,6 +11,7 @@
 		4020DA4626D034CC0083DD3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4526D034CC0083DD3F /* Assets.xcassets */; };
 		4020DA4926D034CC0083DD3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4020DA4826D034CC0083DD3F /* Preview Assets.xcassets */; };
 		4020DA5126D037470083DD3F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4020DA5026D037470083DD3F /* Data.swift */; };
+		4058C75026DD57B7008B12D7 /* PathMonitorClient in Frameworks */ = {isa = PBXBuildFile; productRef = 4058C74F26DD57B7008B12D7 /* PathMonitorClient */; };
 		40918F5726D62CA900C7FF9B /* WeatherClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 40918F5626D62CA900C7FF9B /* WeatherClientLive */; };
 		40D7AA5026D62A1100182290 /* WeatherFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 40D7AA4F26D62A1100182290 /* WeatherFeature */; };
 /* End PBXBuildFile section */
@@ -22,6 +23,7 @@
 		4020DA4826D034CC0083DD3F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		4020DA4A26D034CC0083DD3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4020DA5026D037470083DD3F /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		4058C74E26DD5710008B12D7 /* PathMonitorClient */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PathMonitorClient; path = DesigningDependencies/PathMonitorClient; sourceTree = "<group>"; };
 		40ED016F26D5A5FD00847E78 /* WeatherClient */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WeatherClient; sourceTree = "<group>"; };
 		40ED017526D625A300847E78 /* WeatherFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WeatherFeature; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -31,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4058C75026DD57B7008B12D7 /* PathMonitorClient in Frameworks */,
 				40918F5726D62CA900C7FF9B /* WeatherClientLive in Frameworks */,
 				40D7AA5026D62A1100182290 /* WeatherFeature in Frameworks */,
 			);
@@ -42,6 +45,7 @@
 		4020DA3526D034CB0083DD3F = {
 			isa = PBXGroup;
 			children = (
+				4058C74E26DD5710008B12D7 /* PathMonitorClient */,
 				4020DA4026D034CB0083DD3F /* DesigningDependencies */,
 				4020DA3F26D034CB0083DD3F /* Products */,
 				40ED017026D5A74800847E78 /* Frameworks */,
@@ -104,6 +108,7 @@
 			packageProductDependencies = (
 				40D7AA4F26D62A1100182290 /* WeatherFeature */,
 				40918F5626D62CA900C7FF9B /* WeatherClientLive */,
+				4058C74F26DD57B7008B12D7 /* PathMonitorClient */,
 			);
 			productName = DesigningDependencies;
 			productReference = 4020DA3E26D034CB0083DD3F /* DesigningDependencies.app */;
@@ -350,6 +355,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4058C74F26DD57B7008B12D7 /* PathMonitorClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PathMonitorClient;
+		};
 		40918F5626D62CA900C7FF9B /* WeatherClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WeatherClientLive;
