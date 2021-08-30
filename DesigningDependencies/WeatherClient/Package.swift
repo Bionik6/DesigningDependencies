@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "WeatherClient",
-  platforms: [.iOS(.v13)],
+  platforms: [.iOS(.v14)],
   products: [
     .library(name: "WeatherClient",targets: ["WeatherClient"]),
     .library(name: "WeatherClientLive", targets: ["WeatherClientLive"]),

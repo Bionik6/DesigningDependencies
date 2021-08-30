@@ -4,6 +4,7 @@ import PathMonitorClient
 
 
 extension PathMonitorClient {
+  
   public static func live(queue: DispatchQueue) -> Self {
     let monitor = NWPathMonitor()
     let subject = PassthroughSubject<NWPath, Never>()
@@ -17,4 +18,5 @@ extension PathMonitorClient {
       .eraseToAnyPublisher()
     )
   }
+  
 }

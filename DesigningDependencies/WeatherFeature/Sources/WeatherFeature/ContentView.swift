@@ -4,10 +4,10 @@ import CoreLocation
 import WeatherClient
 import PathMonitorClient
 
-
 public class AppViewModel: ObservableObject {
   private var weatherClient: WeatherClient
   private var pathMonitorClient: PathMonitorClient
+  private var pathUpdateCancellable: AnyCancellable?
   private var weatherRequestCancellable: AnyCancellable?
   
   @Published var isConnected = true
@@ -19,20 +19,18 @@ public class AppViewModel: ObservableObject {
   ) {
     self.weatherClient = weatherClient
     self.pathMonitorClient = pathMonitorClient
-    
-    self.pathMonitorClient.setPathUpdateHandler = { [weak self] path in
-      guard let self = self else { return }
-      // let result = path(NetworkPath(status: .satisfied))
-      // self.isConnected = path.status == .satisfied
-      if self.isConnected == true {
-        self.refreshWeather()
-      } else {
-        self.weatherResults = []
+    pathUpdateCancellable = self.pathMonitorClient.networkPublisher
+      .map { $0.status == .satisfied }
+      .removeDuplicates()
+      .sink { [weak self] isConnected in
+        guard let self = self else { return }
+        self.isConnected = isConnected
+        if self.isConnected == true {
+          self.refreshWeather()
+        } else {
+          self.weatherResults = []
+        }
       }
-    }
-    
-    pathMonitorClient.start(.main)
-    // self.refreshWeather()
   }
   
   private func refreshWeather() {
@@ -42,7 +40,6 @@ public class AppViewModel: ObservableObject {
       .sink { _ in }
         receiveValue: { [weak self] in self?.weatherResults = $0.consolidatedWeather }
   }
-  
 }
 
 public struct ContentView: View {
@@ -97,7 +94,7 @@ public struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied))
+    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .satisfied))
   }
 }
 
