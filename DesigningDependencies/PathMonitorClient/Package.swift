@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "PathMonitorClient",
-  platforms: [.iOS(.v13)],
+  platforms: [.iOS(.v14)],
   products: [
     .library(name: "PathMonitorClient", targets: ["PathMonitorClient"]),
     .library(name: "PathMonitorClientLive", targets: ["PathMonitorClientLive"]),

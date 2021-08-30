@@ -17,17 +17,9 @@ extension NetworkPath {
 }
 
 public struct PathMonitorClient {
-  public var cancel: () -> Void
-  public var setPathUpdateHandler: (@escaping (NetworkPath) -> Void) -> Void
-  public var start: (DispatchQueue) -> Void
+  public var networkPublisher: AnyPublisher<NetworkPath, Never>
   
-  public init(
-    cancel: @escaping () -> Void,
-    setPathUpdateHandler: @escaping (@escaping (NetworkPath) -> Void) -> Void,
-    start: @escaping (DispatchQueue) -> Void
-  ) {
-    self.cancel = cancel
-    self.setPathUpdateHandler = setPathUpdateHandler
-    self.start = start
+  public init(networkPublisher: AnyPublisher<NetworkPath, Never>) {
+    self.networkPublisher = networkPublisher
   }
 }
