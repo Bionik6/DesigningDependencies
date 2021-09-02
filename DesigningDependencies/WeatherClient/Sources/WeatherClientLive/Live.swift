@@ -9,7 +9,11 @@ extension WeatherClient {
       .receive(on: DispatchQueue.main)
       .eraseToAnyPublisher()
   }, searchLocations:  { coordinates in
-    fatalError()
+    URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/search?lattlong=\(coordinates.latitude),\(coordinates.longitude)")!)
+      .map { data, _ in data }
+      .decode(type: [Location].self, decoder: weatherJsonDecoder)
+      .receive(on: DispatchQueue.main)
+      .eraseToAnyPublisher()
   })
 }
 

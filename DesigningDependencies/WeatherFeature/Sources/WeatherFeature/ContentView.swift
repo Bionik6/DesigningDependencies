@@ -4,9 +4,10 @@ import CoreLocation
 import WeatherClient
 import PathMonitorClient
 
-public class AppViewModel: ObservableObject {
-  private var weatherClient: WeatherClient
-  private var pathMonitorClient: PathMonitorClient
+public class AppViewModel: NSObject, ObservableObject {
+  private let weatherClient: WeatherClient
+  private let locationManager: CLLocationManager
+  private let pathMonitorClient: PathMonitorClient
   private var pathUpdateCancellable: AnyCancellable?
   private var weatherRequestCancellable: AnyCancellable?
   
@@ -15,10 +16,13 @@ public class AppViewModel: ObservableObject {
   
   public init(
     weatherClient: WeatherClient,
-    pathMonitorClient: PathMonitorClient
+    pathMonitorClient: PathMonitorClient,
+    locationManager: CLLocationManager
   ) {
     self.weatherClient = weatherClient
     self.pathMonitorClient = pathMonitorClient
+    self.locationManager = locationManager
+    super.init()
     pathUpdateCancellable = self.pathMonitorClient.networkPublisher
       .map { $0.status == .satisfied }
       .removeDuplicates()
@@ -36,10 +40,26 @@ public class AppViewModel: ObservableObject {
   private func refreshWeather() {
     weatherResults = []
     weatherRequestCancellable = weatherClient
-      .weather(10)
+      .weather(2459115)
       .sink { _ in }
         receiveValue: { [weak self] in self?.weatherResults = $0.consolidatedWeather }
   }
+  
+  func locationButtonTapped() {
+    
+    locationManager.delegate = self
+    switch locationManager.authorizationStatus {
+    case .notDetermined:
+      locationManager.requestWhenInUseAuthorization()
+    case .restricted, .denied: break // TODO: show an alert
+    case .authorizedAlways, .authorizedWhenInUse: locationManager.requestLocation()
+    @unknown default: break
+    }
+  }
+}
+
+extension AppViewModel: CLLocationManagerDelegate {
+  
 }
 
 public struct ContentView: View {
@@ -66,7 +86,7 @@ public struct ContentView: View {
           }
           
           Button(
-            action: {  }
+            action: { self.viewModel.locationButtonTapped() }
           ) {
             Image(systemName: "location.fill")
               .foregroundColor(.white)
@@ -94,7 +114,7 @@ public struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied))
+    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied, locationManager: CLLocationManager()))
   }
 }
 
