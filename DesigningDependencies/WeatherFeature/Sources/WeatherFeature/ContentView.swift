@@ -9,8 +9,8 @@ struct LocationClient {
   var requestLocation: () -> Void
   var requestWhenInUseAuthorization: () -> Void
   var authorizationStatus: () -> CLAuthorizationStatus
-  // var setDelegate: (CLLocationManagerDelegate) -> ()
   var delegate: AnyPublisher<DelegateEvent, Never>
+  // var setDelegate: (CLLocationManagerDelegate) -> ()
   
   enum DelegateEvent {
     case didChangeAuthorizationStatus(CLAuthorizationStatus)
