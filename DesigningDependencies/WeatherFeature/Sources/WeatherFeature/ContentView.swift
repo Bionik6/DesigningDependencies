@@ -10,8 +10,10 @@ public class AppViewModel: NSObject, ObservableObject {
   private let pathMonitorClient: PathMonitorClient
   private var pathUpdateCancellable: AnyCancellable?
   private var weatherRequestCancellable: AnyCancellable?
+  private var searchLocationsCancellable: AnyCancellable?
   
   @Published var isConnected = true
+  @Published var currentLocation: Location?
   @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
   public init(
@@ -38,15 +40,15 @@ public class AppViewModel: NSObject, ObservableObject {
   }
   
   private func refreshWeather() {
+    guard let location = self.currentLocation else { return }
     weatherResults = []
     weatherRequestCancellable = weatherClient
-      .weather(2459115)
+      .weather(location.woeid)
       .sink { _ in }
         receiveValue: { [weak self] in self?.weatherResults = $0.consolidatedWeather }
   }
   
   func locationButtonTapped() {
-    
     locationManager.delegate = self
     switch locationManager.authorizationStatus {
     case .notDetermined:
@@ -59,7 +61,27 @@ public class AppViewModel: NSObject, ObservableObject {
 }
 
 extension AppViewModel: CLLocationManagerDelegate {
+  public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    switch manager.authorizationStatus {
+    case .notDetermined: break
+    case .restricted, .denied: break // TODO: show an alert
+    case .authorizedAlways, .authorizedWhenInUse: locationManager.requestLocation()
+    @unknown default: break
+    }
+  }
   
+  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    guard let location = locations.first else { return }
+    searchLocationsCancellable = weatherClient
+      .searchLocations(location.coordinate)
+      .sink { _ in } receiveValue: { [weak self] locations in
+        self?.currentLocation = locations.first
+        self?.refreshWeather()
+      }
+  }
+  
+  public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+  }
 }
 
 public struct ContentView: View {
@@ -107,14 +129,14 @@ public struct ContentView: View {
           .background(Color.red)
         }
       }
-      .navigationBarTitle("Weather")
+      .navigationBarTitle(viewModel.currentLocation?.title ?? "Weather")
     }
   }
 }
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied, locationManager: CLLocationManager()))
+    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .satisfied, locationManager: CLLocationManager()))
   }
 }
 
