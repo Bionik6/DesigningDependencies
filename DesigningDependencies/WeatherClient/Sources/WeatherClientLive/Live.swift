@@ -2,8 +2,8 @@ import Foundation
 import WeatherClient
 
 extension WeatherClient {
-  public static let live = Self(weather: {
-    URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/2459115")!)
+  public static let live = Self(weather: { id in 
+    URLSession.shared.dataTaskPublisher(for: URL(string: "https://www.metaweather.com/api/location/\(id)")!)
       .map { data, _ in data }
       .decode(type: WeatherResponse.self, decoder: weatherJsonDecoder)
       .receive(on: DispatchQueue.main)

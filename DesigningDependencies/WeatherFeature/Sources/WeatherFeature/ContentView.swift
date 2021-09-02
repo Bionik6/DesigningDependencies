@@ -36,7 +36,7 @@ public class AppViewModel: ObservableObject {
   private func refreshWeather() {
     weatherResults = []
     weatherRequestCancellable = weatherClient
-      .weather()
+      .weather(10)
       .sink { _ in }
         receiveValue: { [weak self] in self?.weatherResults = $0.consolidatedWeather }
   }
@@ -94,7 +94,7 @@ public struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .satisfied))
+    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .unsatisfied))
   }
 }
 

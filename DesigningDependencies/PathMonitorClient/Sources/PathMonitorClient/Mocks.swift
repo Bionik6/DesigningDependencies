@@ -9,7 +9,7 @@ extension PathMonitorClient {
   )
   
   public static let unsatisfied = Self(
-    networkPublisher: Just(NetworkPath(status: .satisfied))
+    networkPublisher: Just(NetworkPath(status: .unsatisfied))
       .eraseToAnyPublisher()
   )
   
