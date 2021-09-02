@@ -9,7 +9,7 @@ import PathMonitorClientLive
 struct DesigningDependenciesApp: App {
   var body: some Scene {
     WindowGroup {
-      ContentView(viewModel: AppViewModel(weatherClient: .live, pathMonitorClient: .live(queue: .main), locationManager: CLLocationManager()))
+      ContentView(viewModel: AppViewModel(weatherClient: .live, pathMonitorClient: .live(queue: .main), locationClient: .live))
     }
   }
 }
