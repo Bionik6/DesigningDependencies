@@ -3,117 +3,22 @@ import Combine
 import CoreLocation
 import WeatherClient
 import PathMonitorClient
-
-
-public struct LocationClient {
-  var requestLocation: () -> Void
-  var requestWhenInUseAuthorization: () -> Void
-  var authorizationStatus: () -> CLAuthorizationStatus
-  var delegate: AnyPublisher<DelegateEvent, Never>
-  
-  enum DelegateEvent {
-    case didChangeAuthorizationStatus(CLAuthorizationStatus)
-    case didUpdateLocations([CLLocation])
-    case didFailWithError(Error)
-  }
-}
-
-extension LocationClient {
-  
-  public static var live: Self {
-    
-    class Delegate: NSObject, CLLocationManagerDelegate {
-      var subject = PassthroughSubject<DelegateEvent, Never>()
-      
-      init(subject: PassthroughSubject<DelegateEvent, Never>) {
-        self.subject = subject
-      }
-      
-      func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        subject.send(.didChangeAuthorizationStatus(manager.authorizationStatus))
-      }
-      
-      func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        subject.send(.didUpdateLocations(locations))
-      }
-      
-      func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        subject.send(.didFailWithError(error))
-      }
-    }
-    
-    let locationManager = CLLocationManager()
-    let subject = PassthroughSubject<DelegateEvent, Never>()
-    var delegate: Delegate? = Delegate(subject: subject)
-    locationManager.delegate = delegate
-    
-    return Self(
-      requestLocation: locationManager.requestLocation,
-      requestWhenInUseAuthorization: locationManager.requestWhenInUseAuthorization,
-      authorizationStatus: { locationManager.authorizationStatus },
-      delegate: subject
-        .handleEvents(receiveCancel: { delegate = nil })
-        .eraseToAnyPublisher()
-    )
-  }
-  
-}
-
-extension LocationClient {
-  
-  static var authorizedWhenInUse: Self {
-    let subject = PassthroughSubject<DelegateEvent, Never>()
-    return Self(
-      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
-      requestWhenInUseAuthorization: { },
-      authorizationStatus: { .authorizedWhenInUse },
-      delegate: subject.eraseToAnyPublisher()
-    )
-  }
-  
-  static var notDetermined: Self {
-    var status = CLAuthorizationStatus.notDetermined
-    let subject = PassthroughSubject<DelegateEvent, Never>()
-    return Self(
-      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
-      requestWhenInUseAuthorization: {
-        status = .authorizedWhenInUse
-        subject.send(.didChangeAuthorizationStatus(status))
-      },
-      authorizationStatus: { status },
-      delegate: subject.eraseToAnyPublisher()
-    )
-  }
-  
-  static var notDeterminedDenied: Self {
-    var status = CLAuthorizationStatus.notDetermined
-    let subject = PassthroughSubject<DelegateEvent, Never>()
-    return Self(
-      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
-      requestWhenInUseAuthorization: {
-        status = .denied
-        subject.send(.didChangeAuthorizationStatus(status))
-      },
-      authorizationStatus: { status },
-      delegate: subject.eraseToAnyPublisher()
-    )
-  }
-  
-}
+import LocationClient
 
 
 public class AppViewModel: ObservableObject {
+  @Published var isConnected = true
+  @Published var currentLocation: Location?
+  @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
+  
   private let weatherClient: WeatherClient
   private let locationClient: LocationClient
   private let pathMonitorClient: PathMonitorClient
+  
   private var pathUpdateCancellable: AnyCancellable?
   private var weatherRequestCancellable: AnyCancellable?
   private var searchLocationsCancellable: AnyCancellable?
   private var locationDelegateCancellable: AnyCancellable?
-  
-  @Published var isConnected = true
-  @Published var currentLocation: Location?
-  @Published var weatherResults: [WeatherResponse.ConsolidatedWeather] = []
   
   public init(
     weatherClient: WeatherClient,
