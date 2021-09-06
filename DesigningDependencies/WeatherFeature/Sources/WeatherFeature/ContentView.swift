@@ -10,7 +10,6 @@ public struct LocationClient {
   var requestWhenInUseAuthorization: () -> Void
   var authorizationStatus: () -> CLAuthorizationStatus
   var delegate: AnyPublisher<DelegateEvent, Never>
-  // var setDelegate: (CLLocationManagerDelegate) -> ()
   
   enum DelegateEvent {
     case didChangeAuthorizationStatus(CLAuthorizationStatus)
@@ -25,7 +24,7 @@ extension LocationClient {
     
     class Delegate: NSObject, CLLocationManagerDelegate {
       var subject = PassthroughSubject<DelegateEvent, Never>()
-    
+      
       init(subject: PassthroughSubject<DelegateEvent, Never>) {
         self.subject = subject
       }
@@ -55,6 +54,48 @@ extension LocationClient {
       delegate: subject
         .handleEvents(receiveCancel: { delegate = nil })
         .eraseToAnyPublisher()
+    )
+  }
+  
+}
+
+extension LocationClient {
+  
+  static var authorizedWhenInUse: Self {
+    let subject = PassthroughSubject<DelegateEvent, Never>()
+    return Self(
+      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
+      requestWhenInUseAuthorization: { },
+      authorizationStatus: { .authorizedWhenInUse },
+      delegate: subject.eraseToAnyPublisher()
+    )
+  }
+  
+  static var notDetermined: Self {
+    var status = CLAuthorizationStatus.notDetermined
+    let subject = PassthroughSubject<DelegateEvent, Never>()
+    return Self(
+      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
+      requestWhenInUseAuthorization: {
+        status = .authorizedWhenInUse
+        subject.send(.didChangeAuthorizationStatus(status))
+      },
+      authorizationStatus: { status },
+      delegate: subject.eraseToAnyPublisher()
+    )
+  }
+  
+  static var notDeterminedDenied: Self {
+    var status = CLAuthorizationStatus.notDetermined
+    let subject = PassthroughSubject<DelegateEvent, Never>()
+    return Self(
+      requestLocation: { subject.send(.didUpdateLocations([CLLocation()])) },
+      requestWhenInUseAuthorization: {
+        status = .denied
+        subject.send(.didChangeAuthorizationStatus(status))
+      },
+      authorizationStatus: { status },
+      delegate: subject.eraseToAnyPublisher()
     )
   }
   
@@ -96,7 +137,7 @@ public class AppViewModel: ObservableObject {
       }
     
     
-    locationDelegateCancellable =  locationClient.delegate
+    locationDelegateCancellable = locationClient.delegate
       .sink { [weak self] event in
         switch event {
         case .didChangeAuthorizationStatus(let status):
@@ -118,6 +159,10 @@ public class AppViewModel: ObservableObject {
           break
         }
       }
+    
+    if self.locationClient.authorizationStatus() == .authorizedWhenInUse {
+      self.locationClient.requestLocation()
+    }
   }
   
   private func refreshWeather() {
@@ -156,7 +201,7 @@ public struct ContentView: View {
               VStack(alignment: .leading) {
                 Text(dayOfWeekFormatter.string(from: weather.applicableDate).capitalized)
                   .font(.title)
-                Text("Current temp: \(weather.theTemp, specifier: "%.1f")°C")
+                Text("Current temp: \(weather.theTemp, specifier: "%.1f")°C").bold()
                 Text("Max temp: \(weather.maxTemp, specifier: "%.1f")°C")
                 Text("Min temp: \(weather.minTemp, specifier: "%.1f")°C")
               }
@@ -192,7 +237,13 @@ public struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    return ContentView(viewModel: AppViewModel(weatherClient: .happyPath, pathMonitorClient: .satisfied, locationClient: .live))
+    return ContentView(
+      viewModel: AppViewModel(
+        weatherClient: .happyPath,
+        pathMonitorClient: .satisfied,
+        locationClient: .notDeterminedDenied
+      )
+    )
   }
 }
 
