@@ -2,6 +2,7 @@ import SwiftUI
 import CoreLocation
 import WeatherFeature
 import WeatherClientLive
+import LocationClientLive
 import PathMonitorClientLive
 
 
