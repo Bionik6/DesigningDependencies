@@ -31,6 +31,14 @@ extension Location {
   static let brooklyn = Location(title: "Brooklyn", woeid: 1)
 }
 
+extension WeatherClient {
+  static let unimplemented = Self(
+    weather: { _ in fatalError() },
+    searchLocations: { _ in fatalError() }
+  )
+
+}
+
 
 final class WeatherFeatureTests: XCTestCase {
   
@@ -49,5 +57,15 @@ final class WeatherFeatureTests: XCTestCase {
     XCTAssertEqual(viewModel.weatherResults, WeatherResponse.moderateWeather.consolidatedWeather)
   }
   
-  
+  func test_disconnected_state() {
+    let viewModel = AppViewModel(
+      weatherClient: .unimplemented,
+      pathMonitorClient: .unsatisfied,
+      locationClient: .authorizedWhenInUse
+    )
+    
+    XCTAssertEqual(viewModel.currentLocation, nil)
+    XCTAssertEqual(viewModel.isConnected, false)
+    XCTAssertEqual(viewModel.weatherResults, [])
+  }
 }

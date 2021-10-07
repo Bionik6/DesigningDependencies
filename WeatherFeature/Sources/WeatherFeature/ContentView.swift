@@ -52,7 +52,7 @@ public class AppViewModel: ObservableObject {
               @unknown default: break
             }
           case .didUpdateLocations(let locations):
-            guard let location = locations.first else { return }
+            guard self!.isConnected, let location = locations.first else { return }
             self?.searchLocationsCancellable = weatherClient
               .searchLocations(location.coordinate)
               .sink { _ in } receiveValue: { [weak self] locations in
