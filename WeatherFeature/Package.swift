@@ -1,6 +1,4 @@
-// swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version:5.4
 import PackageDescription
 
 let package = Package(
@@ -12,9 +10,10 @@ let package = Package(
   dependencies: [
     .package(name: "WeatherClient", path: "WeatherClient"),
     .package(name: "PathMonitorClient", path: "PathMonitorClient"),
+    .package(name: "LocationClient", path: "LocationClient"),
   ],
   targets: [
     .target(name: "WeatherFeature", dependencies: ["WeatherClient", "PathMonitorClient"]),
-    .testTarget(name: "WeatherFeatureTests", dependencies: ["WeatherFeature"]),
+    .testTarget(name: "WeatherFeatureTests", dependencies: ["WeatherFeature", "LocationClient"]),
   ]
 )

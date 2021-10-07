@@ -31,7 +31,7 @@ public struct WeatherResponse: Decodable, Equatable {
 }
 
 
-public struct Location: Decodable {
+public struct Location: Decodable, Equatable {
   public var title: String
   public  var woeid: Int
 }

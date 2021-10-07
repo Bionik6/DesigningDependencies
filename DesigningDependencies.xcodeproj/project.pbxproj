@@ -25,7 +25,7 @@
 		4020DA4A26D034CC0083DD3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4020DA5026D037470083DD3F /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		4058C74E26DD5710008B12D7 /* PathMonitorClient */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PathMonitorClient; sourceTree = "<group>"; };
-		406E1DD726E5FF44004BF183 /* LocationClient */ = {isa = PBXFileReference; lastKnownFileType = folder; name = LocationClient; path = ../../Projects/Charabia/charabia_ios/LocationClient; sourceTree = "<group>"; };
+		406E1DD726E5FF44004BF183 /* LocationClient */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LocationClient; sourceTree = "<group>"; };
 		40ED016F26D5A5FD00847E78 /* WeatherClient */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WeatherClient; sourceTree = "<group>"; };
 		40ED017526D625A300847E78 /* WeatherFeature */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WeatherFeature; sourceTree = "<group>"; };
 /* End PBXFileReference section */

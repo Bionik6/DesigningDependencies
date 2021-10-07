@@ -2,8 +2,8 @@ import SwiftUI
 import Combine
 import CoreLocation
 import WeatherClient
-import PathMonitorClient
 import LocationClient
+import PathMonitorClient
 
 
 public class AppViewModel: ObservableObject {
@@ -41,27 +41,26 @@ public class AppViewModel: ObservableObject {
         }
       }
     
-    
     locationDelegateCancellable = locationClient.delegate
       .sink { [weak self] event in
         switch event {
-        case .didChangeAuthorizationStatus(let status):
-          switch status {
-          case .notDetermined: break
-          case .restricted, .denied: break // TODO: show an alert
-          case .authorizedAlways, .authorizedWhenInUse: locationClient.requestLocation()
-          @unknown default: break
-          }
-        case .didUpdateLocations(let locations):
-          guard let location = locations.first else { return }
-          self?.searchLocationsCancellable = weatherClient
-            .searchLocations(location.coordinate)
-            .sink { _ in } receiveValue: { [weak self] locations in
-              self?.currentLocation = locations.first
-              self?.refreshWeather()
+          case .didChangeAuthorizationStatus(let status):
+            switch status {
+              case .notDetermined: break
+              case .restricted, .denied: break // TODO: show an alert
+              case .authorizedAlways, .authorizedWhenInUse: locationClient.requestLocation()
+              @unknown default: break
             }
-        case .didFailWithError(_):
-          break
+          case .didUpdateLocations(let locations):
+            guard let location = locations.first else { return }
+            self?.searchLocationsCancellable = weatherClient
+              .searchLocations(location.coordinate)
+              .sink { _ in } receiveValue: { [weak self] locations in
+                self?.currentLocation = locations.first
+                self?.refreshWeather()
+              }
+          case .didFailWithError(_):
+            break
         }
       }
     
@@ -81,11 +80,11 @@ public class AppViewModel: ObservableObject {
   
   func locationButtonTapped() {
     switch locationClient.authorizationStatus() {
-    case .notDetermined:
-      locationClient.requestWhenInUseAuthorization()
-    case .restricted, .denied: break // TODO: show an alert
-    case .authorizedAlways, .authorizedWhenInUse: locationClient.requestLocation()
-    @unknown default: break
+      case .notDetermined:
+        locationClient.requestWhenInUseAuthorization()
+      case .restricted, .denied: break // TODO: show an alert
+      case .authorizedAlways, .authorizedWhenInUse: locationClient.requestLocation()
+      @unknown default: break
     }
   }
 }
