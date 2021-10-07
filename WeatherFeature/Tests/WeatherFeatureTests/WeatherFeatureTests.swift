@@ -68,4 +68,33 @@ final class WeatherFeatureTests: XCTestCase {
     XCTAssertEqual(viewModel.isConnected, false)
     XCTAssertEqual(viewModel.weatherResults, [])
   }
+  
+  func test_path_updates() {
+    let pathUpdateSubject = PassthroughSubject<NetworkPath, Never>()
+    let viewModel = AppViewModel(
+      weatherClient: WeatherClient(
+        weather: { _ in .init(.moderateWeather) },
+        searchLocations: { _ in .init([.brooklyn]) }
+      ),
+      pathMonitorClient: PathMonitorClient(networkPublisher: pathUpdateSubject.eraseToAnyPublisher()),
+      locationClient: .authorizedWhenInUse
+    )
+    pathUpdateSubject.send(.init(status: .satisfied))
+    
+    XCTAssertEqual(viewModel.currentLocation, .brooklyn)
+    XCTAssertEqual(viewModel.isConnected, true)
+    XCTAssertEqual(viewModel.weatherResults, WeatherResponse.moderateWeather.consolidatedWeather)
+    
+    pathUpdateSubject.send(.init(status: .unsatisfied))
+    
+    XCTAssertEqual(viewModel.currentLocation, .brooklyn)
+    XCTAssertEqual(viewModel.isConnected, false)
+    XCTAssertEqual(viewModel.weatherResults, [])
+    
+    pathUpdateSubject.send(.init(status: .satisfied))
+    
+    XCTAssertEqual(viewModel.currentLocation, .brooklyn)
+    XCTAssertEqual(viewModel.isConnected, true)
+    XCTAssertEqual(viewModel.weatherResults, WeatherResponse.moderateWeather.consolidatedWeather)
+  }
 }
